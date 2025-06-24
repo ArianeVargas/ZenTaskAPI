@@ -6,6 +6,7 @@ import com.example.zentaskapi.auth.service.JwtUtil;
 import com.example.zentaskapi.entity.User;
 import com.example.zentaskapi.entity.taskmanagerapi.UserRole;
 import com.example.zentaskapi.repository.UserRepository;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -48,7 +49,11 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<Void> register(@RequestBody RegisterRequest req) {
+    public ResponseEntity<?> register(@RequestBody @Valid RegisterRequest req) {
+        if (userRepo.existsByUsername(req.getUsername()) || userRepo.existsByEmail(req.getEmail())) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Username or email already in use.");
+        }
+
         User user = new User();
         user.setUsername(req.getUsername());
         user.setFullName(req.getFullName());
@@ -56,6 +61,7 @@ public class AuthController {
         user.setEmail(req.getEmail());
         user.setRole(UserRole.USER);
         userRepo.save(user);
+
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }
