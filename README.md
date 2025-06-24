@@ -1,3 +1,4 @@
+
 # 🚀 Zentask API
 
 Una API RESTful para la gestión de tareas y proyectos, desarrollada con **Spring Boot**.
@@ -25,7 +26,7 @@ Cuenta con seguridad robusta mediante **Spring Security + JWT**, y **autenticaci
 - Spring Security + JWT
 - Spring Data JPA
 - PostgreSQL
-- Springdoc OpenAPI (Swagger UI)
+- Postman
 
 ---
 
@@ -36,6 +37,17 @@ Cuenta con seguridad robusta mediante **Spring Security + JWT**, y **autenticaci
 - JDK 17+
 - Maven 3.x
 - PostgreSQL 14+
+
+### 🔐 Generar claves para JWT (RS256)
+
+Antes de ejecutar la aplicación, debes generar las llaves pública y privada necesarias:
+
+```bash
+openssl genrsa -out private.key 2048
+openssl rsa -in private.key -pubout -out public.key
+```
+
+Guárdalas en la ruta `src/main/resources/jwt/`.
 
 ### 🔧 Pasos
 
@@ -48,14 +60,14 @@ Cuenta con seguridad robusta mediante **Spring Security + JWT**, y **autenticaci
 
 2. **Configurar la Base de Datos**
 
-    - Crea una base de datos llamada `zentask` en PostgreSQL.
-    - Configura las siguientes variables de entorno:
+   - Crea una base de datos llamada `zentask` en PostgreSQL.
+   - Configura las siguientes variables de entorno:
 
-      ```env
-      DB_URL=jdbc:postgresql://localhost:5432/zentask
-      DB_USERNAME=tu_usuario
-      DB_PASSWORD=tu_contraseña
-      ```
+     ```env
+     DB_URL=jdbc:postgresql://localhost:5432/zentask
+     DB_USERNAME=tu_usuario
+     DB_PASSWORD=tu_contraseña
+     ```
 
    > 💡 También puedes usar `application.properties` para valores locales por defecto.
 
@@ -91,57 +103,77 @@ Para acceder a los endpoints protegidos:
 
 ## 📦 Endpoints Principales
 
+### 🌐 Públicos
+
+| Método | Endpoint             | Acción   | 
+|--------|----------------------|----------|
+| GET    | `/ZenTaskAPI`        | Verificar estado del backend   |   
+| POST   | `/api/auth/register` | Registro de usuario nuevo      |
+| POST   | `/api/auth/login`    | Autenticación (login)          |
+
+---
+
 ### 👤 Usuarios
 
-| Método | Endpoint                         | Acceso             |
-|--------|----------------------------------|---------------------|
-| GET    | `/api/users`                     | ADMIN              |
-| GET    | `/api/users/{id}`                | ADMIN, PROJECT_MANAGER, el mismo usuario |
-| POST   | `/api/users`                     | ADMIN              |
-| PUT    | `/api/users/{id}`                | ADMIN, el mismo usuario |
-| DELETE | `/api/users/{id}`                | ADMIN              |
-| GET    | `/api/users/{id}/time-entries`   | ADMIN, el mismo usuario, MANAGER |
+| Método | Endpoint                       | Acción                        | Acceso                                    |
+|--------|--------------------------------|-------------------------------|-------------------------------------------|
+| GET    | `/api/users`                   | Listar todos los usuarios     | ADMIN                                     |
+| GET    | `/api/users/{id}`              | Ver detalles de un usuario    | ADMIN, PROJECT_MANAGER, el mismo usuario  |
+| POST   | `/api/users`                   | Crear nuevo usuario           | ADMIN                                     |
+| PUT    | `/api/users/{id}`              | Editar usuario existente      | ADMIN, el mismo usuario                   |
+| DELETE | `/api/users/{id}`              | Eliminar usuario              | ADMIN                                     |
+| GET    | `/api/users/{id}/time-entries` | Ver registros de tiempo       | ADMIN, el mismo usuario, MANAGER          |
+
+---
 
 ### ✅ Tareas
 
-| Método | Endpoint                          | Acceso                     |
-|--------|-----------------------------------|----------------------------|
-| GET    | `/api/tasks`                      | Todos los roles           |
-| GET    | `/api/tasks/{id}`                 | Participantes del proyecto |
-| POST   | `/api/tasks`                      | MANAGER, ADMIN             |
-| PUT    | `/api/tasks/{id}`                 | Asignado o MANAGER         |
-| PATCH  | `/api/tasks/{id}/status`          | Asignado                   |
-| PATCH  | `/api/tasks/{id}/assign`          | MANAGER                    |
-| DELETE | `/api/tasks/{id}`                 | MANAGER, ADMIN             |
+| Método | Endpoint                      | Acción                          | Acceso                     |
+|--------|-------------------------------|----------------------------------|----------------------------|
+| GET    | `/api/tasks`                  | Listar todas las tareas         | Todos los roles            |
+| GET    | `/api/tasks/{id}`             | Ver detalles de una tarea       | Participantes del proyecto |
+| POST   | `/api/tasks`                  | Crear una nueva tarea           | MANAGER, ADMIN             |
+| PUT    | `/api/tasks/{id}`             | Editar tarea                    | Asignado o MANAGER         |
+| PATCH  | `/api/tasks/{id}/status`      | Cambiar estado de la tarea      | Asignado                   |
+| PATCH  | `/api/tasks/{id}/assign`      | Asignar tarea a un usuario      | MANAGER                    |
+| DELETE | `/api/tasks/{id}`             | Eliminar tarea                  | MANAGER, ADMIN             |
+
+---
 
 ### ⏱️ Registros de Tiempo
 
-| Método | Endpoint                                | Acceso           |
-|--------|-----------------------------------------|------------------|
-| POST   | `/api/tasks/{id}/time-entries`          | Asignado         |
-| GET    | `/api/users/{userId}/time-entries`      | ADMIN, el mismo usuario |
+| Método | Endpoint                            | Acción                            | Acceso                 |
+|--------|-------------------------------------|-----------------------------------|------------------------|
+| POST   | `/api/tasks/{id}/time-entries`      | Crear registro de tiempo          | Asignado               |
+| GET    | `/api/users/{userId}/time-entries`  | Ver registros del usuario         | ADMIN, el mismo usuario|
+
+---
 
 ### 💬 Comentarios
 
-| Método | Endpoint                         | Acceso           |
-|--------|----------------------------------|------------------|
-| POST   | `/api/tasks/{id}/comments`       | Participantes    |
-| GET    | `/api/tasks/{id}/comments`       | Participantes    |
+| Método | Endpoint                       | Acción                        | Acceso        |
+|--------|--------------------------------|-------------------------------|---------------|
+| POST   | `/api/tasks/{id}/comments`     | Agregar comentario            | Participantes |
+| GET    | `/api/tasks/{id}/comments`     | Ver comentarios de la tarea   | Participantes |
+
+---
 
 ### 🏷️ Tags
 
-| Método | Endpoint                        | Acceso         |
-|--------|---------------------------------|----------------|
-| POST   | `/api/tags`                     | ADMIN, MANAGER |
-| GET    | `/api/tags`                     | Todos          |
-| POST   | `/api/tasks/{id}/tags`          | MANAGER        |
+| Método | Endpoint                      | Acción                       | Acceso         |
+|--------|-------------------------------|------------------------------|----------------|
+| POST   | `/api/tags`                   | Crear nuevo tag              | ADMIN, MANAGER |
+| GET    | `/api/tags`                   | Listar todos los tags        | Todos          |
+| POST   | `/api/tasks/{id}/tags`        | Asignar tags a una tarea     | MANAGER        |
+
+---
 
 ### 📎 Archivos Adjuntos
 
-| Método | Endpoint                            | Acceso       |
-|--------|-------------------------------------|--------------|
-| POST   | `/api/tasks/{id}/attachments`       | Asignado     |
-| GET    | `/api/tasks/{id}/attachments`       | Participantes |
+| Método | Endpoint                              | Acción                          | Acceso       |
+|--------|---------------------------------------|----------------------------------|--------------|
+| POST   | `/api/tasks/{id}/attachments`         | Subir archivo a una tarea        | Asignado     |
+| GET    | `/api/tasks/{id}/attachments`         | Ver archivos de una tarea        | Participantes|
 
 ---
 
