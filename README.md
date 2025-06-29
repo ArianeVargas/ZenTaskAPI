@@ -96,7 +96,7 @@ Para acceder a los endpoints protegidos:
 3. Incluye el token en las peticiones usando el encabezado:
 
    ```http
-   Authorization: Bearer <tu_jwt_token>
+   Authorization: Bearer Token <tu_jwt_token>
    ```
 
 ---
@@ -115,14 +115,15 @@ Para acceder a los endpoints protegidos:
 
 ### 👤 Usuarios
 
-| Método | Endpoint                       | Acción                        | Acceso                                    |
-|--------|--------------------------------|-------------------------------|-------------------------------------------|
-| GET    | `/api/users`                   | Listar todos los usuarios     | ADMIN                                     |
-| GET    | `/api/users/{id}`              | Ver detalles de un usuario    | ADMIN, PROJECT_MANAGER, el mismo usuario  |
-| POST   | `/api/users`                   | Crear nuevo usuario           | ADMIN                                     |
-| PUT    | `/api/users/{id}`              | Editar usuario existente      | ADMIN, el mismo usuario                   |
-| DELETE | `/api/users/{id}`              | Eliminar usuario              | ADMIN                                     |
-| GET    | `/api/users/{id}/time-entries` | Ver registros de tiempo       | ADMIN, el mismo usuario, MANAGER          |
+| Método | Endpoint                       | Acción                     | Acceso                                    |
+|--------|--------------------------------|----------------------------|-------------------------------------------|
+| GET    | `/api/users`                   | Listar todos los usuarios  | ADMIN                                     |
+| GET    | `/api/users/me`                | Usuario actual             | el mismo usuario                                   |
+| GET    | `/api/users/{username}`              | Ver detalles de un usuario | ADMIN, PROJECT_MANAGER, el mismo usuario  |
+| POST   | `/api/users`                   | Crear nuevo usuario        | ADMIN                                     |
+| PUT    | `/api/users/{id}`              | Editar usuario existente   | ADMIN, el mismo usuario                   |
+| DELETE | `/api/users/{id}`              | Eliminar usuario           | ADMIN                                     |
+| GET    | `/api/users/{id}/time-entries` | Ver registros de tiempo    | ADMIN, el mismo usuario, MANAGER          |
 
 ---
 
