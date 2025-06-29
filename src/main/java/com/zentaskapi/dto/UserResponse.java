@@ -1,13 +1,13 @@
 package com.zentaskapi.dto;
 
 import com.zentaskapi.entity.taskmanagerapi.UserRole;
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 
 import java.util.UUID;
 
+@Builder
 @Data
-@AllArgsConstructor
 public class UserResponse {
     private UUID id;
     private String username;

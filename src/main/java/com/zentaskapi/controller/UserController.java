@@ -28,8 +28,7 @@ public class UserController {
 
     @GetMapping("/me")
     public ResponseEntity<UserResponse> getCurrentUser() {
-        String username = getCurrentUsername();
-        return ResponseEntity.ok(userService.findByUsername(username));
+        return ResponseEntity.ok(userService.findByUsername(getCurrentUsername()));
     }
 
     @GetMapping("/{username}")
@@ -44,16 +43,12 @@ public class UserController {
 
     @PatchMapping("/{id}")
     public ResponseEntity<UserResponse> partialUpdateUser(@PathVariable UUID id, @RequestBody UpdateUserRequest request) {
-        String currentUsername = getCurrentUsername();
-        boolean isAdmin = isCurrentUserAdmin();
-        return ResponseEntity.ok(userService.partialUpdateUser(id, request, currentUsername, isAdmin));
+        return ResponseEntity.ok(userService.partialUpdateUser(id, request, getCurrentUsername(), isCurrentUserAdmin()));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable UUID id) {
-        String currentUsername = getCurrentUsername();
-        boolean isAdmin = isCurrentUserAdmin();
-        userService.deleteUser(id, currentUsername, isAdmin);
+        userService.deleteUser(id, getCurrentUsername(), isCurrentUserAdmin());
         return ResponseEntity.noContent().build();
     }
 
@@ -62,7 +57,9 @@ public class UserController {
     }
 
     private boolean isCurrentUserAdmin() {
-        var auth = SecurityContextHolder.getContext().getAuthentication();
-        return auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+        return SecurityContextHolder.getContext().getAuthentication()
+                .getAuthorities()
+                .stream()
+                .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
     }
 }

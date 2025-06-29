@@ -5,6 +5,7 @@ import com.zentaskapi.auth.dto.RegisterRequest;
 import com.zentaskapi.auth.service.JwtUtil;
 import com.zentaskapi.entity.User;
 import com.zentaskapi.entity.taskmanagerapi.UserRole;
+import com.zentaskapi.mapper.UserMapper;
 import com.zentaskapi.repository.UserRepository;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -27,15 +28,17 @@ public class AuthController {
     private final JwtUtil jwtUtil;
     private final UserRepository userRepo;
     private final PasswordEncoder encoder;
+    private final UserMapper userMapper;
 
     public AuthController(AuthenticationManager authManager,
                           JwtUtil jwtUtil,
                           UserRepository userRepo,
-                          PasswordEncoder encoder) {
+                          PasswordEncoder encoder, UserMapper userMapper) {
         this.authManager = authManager;
         this.jwtUtil = jwtUtil;
         this.userRepo = userRepo;
         this.encoder = encoder;
+        this.userMapper = userMapper;
     }
 
     @PostMapping("/login")
@@ -51,14 +54,11 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody @Valid RegisterRequest req) {
         if (userRepo.existsByUsername(req.getUsername()) || userRepo.existsByEmail(req.getEmail())) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Username or email already in use.");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Nombre de usuario o correo electrónico ya en uso");
         }
 
-        User user = new User();
-        user.setUsername(req.getUsername());
-        user.setFullName(req.getFullName());
+        User user = userMapper.fromRegisterRequest(req);
         user.setPasswordHash(encoder.encode(req.getPassword()));
-        user.setEmail(req.getEmail());
         user.setRole(UserRole.USER);
         userRepo.save(user);
 
