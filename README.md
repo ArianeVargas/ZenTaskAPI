@@ -121,7 +121,7 @@ Para acceder a los endpoints protegidos:
 | GET    | `/api/users/me`                | Usuario actual             | el mismo usuario                                   |
 | GET    | `/api/users/{username}`              | Ver detalles de un usuario | ADMIN, PROJECT_MANAGER, el mismo usuario  |
 | POST   | `/api/users`                   | Crear nuevo usuario        | ADMIN                                     |
-| PUT    | `/api/users/{id}`              | Editar usuario existente   | ADMIN, el mismo usuario                   |
+| PATCH     | `/api/users/{id}`              | Editar usuario existente   | ADMIN, el mismo usuario                   |
 | DELETE | `/api/users/{id}`              | Eliminar usuario           | ADMIN                                     |
 | GET    | `/api/users/{id}/time-entries` | Ver registros de tiempo    | ADMIN, el mismo usuario, MANAGER          |
 
@@ -138,6 +138,19 @@ Para acceder a los endpoints protegidos:
 | PATCH  | `/api/tasks/{id}/status`      | Cambiar estado de la tarea      | Asignado                   |
 | PATCH  | `/api/tasks/{id}/assign`      | Asignar tarea a un usuario      | MANAGER                    |
 | DELETE | `/api/tasks/{id}`             | Eliminar tarea                  | MANAGER, ADMIN             |
+
+---
+
+### 📁 Proyectos
+
+| Método | Endpoint                  | Acción                           | Acceso             |
+|--------|---------------------------|----------------------------------|--------------------|
+| GET    | `/api/projects`          | Listar todos los proyectos       | Todos los roles    |
+| GET    | `/api/projects/{id}`     | Ver detalles de un proyecto      | Todos los roles    |
+| POST   | `/api/projects`          | Crear un nuevo proyecto          | MANAGER, ADMIN     |
+| PUT    | `/api/projects/{id}`     | Editar un proyecto               | MANAGER, ADMIN     |
+| PATCH  | `/api/projects/{id}`     | Actualizar parcialmente          | MANAGER, ADMIN     |
+| DELETE | `/api/projects/{id}`     | Eliminar un proyecto             | ADMIN              |
 
 ---
 
