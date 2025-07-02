@@ -1,8 +1,8 @@
 package com.zentaskapi.entity.taskmanagerapi;
 
 public enum ProjectRole {
-    MANAGER,
-    DEVELOPER,
-    TESTER,
-    DESIGNER
+    MANAGER,   // controla el proyecto: asignar tareas, modificar
+    DEVELOPER, // desarrolla tareas asignadas
+    TESTER,    // prueba tareas
+    DESIGNER   // diseña tareas
 }

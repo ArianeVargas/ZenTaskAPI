@@ -5,6 +5,7 @@ import com.zentaskapi.auth.dto.RegisterRequest;
 import com.zentaskapi.auth.service.JwtUtil;
 import com.zentaskapi.entity.User;
 import com.zentaskapi.entity.taskmanagerapi.UserRole;
+import com.zentaskapi.exception.ResourceNotFoundException;
 import com.zentaskapi.mapper.UserMapper;
 import com.zentaskapi.repository.UserRepository;
 import jakarta.validation.Valid;
@@ -46,7 +47,8 @@ public class AuthController {
         authManager.authenticate(
                 new UsernamePasswordAuthenticationToken(req.getUsername(), req.getPassword())
         );
-        User user = userRepo.findByUsername(req.getUsername()).orElseThrow();
+        User user = userRepo.findByUsername(req.getUsername())
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
         String token = jwtUtil.generateToken(user.getUsername(), user.getRole().name());
         return ResponseEntity.ok(Map.of("token", token));
     }

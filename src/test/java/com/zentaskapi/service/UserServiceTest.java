@@ -1,7 +1,7 @@
 package com.zentaskapi.service;
 
-import com.zentaskapi.dto.CreateUserRequest;
-import com.zentaskapi.dto.UserResponse;
+import com.zentaskapi.dto.user.CreateUserRequest;
+import com.zentaskapi.dto.user.UserResponse;
 import com.zentaskapi.entity.User;
 import com.zentaskapi.entity.taskmanagerapi.UserRole;
 import com.zentaskapi.mapper.UserMapper;

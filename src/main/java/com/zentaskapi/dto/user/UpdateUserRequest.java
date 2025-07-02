@@ -1,4 +1,4 @@
-package com.zentaskapi.dto;
+package com.zentaskapi.dto.user;
 
 import com.zentaskapi.entity.taskmanagerapi.UserRole;
 import jakarta.validation.constraints.Email;

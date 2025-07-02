@@ -1,8 +1,8 @@
 package com.zentaskapi.service;
 
-import com.zentaskapi.dto.CreateUserRequest;
-import com.zentaskapi.dto.UpdateUserRequest;
-import com.zentaskapi.dto.UserResponse;
+import com.zentaskapi.dto.user.CreateUserRequest;
+import com.zentaskapi.dto.user.UpdateUserRequest;
+import com.zentaskapi.dto.user.UserResponse;
 import com.zentaskapi.entity.User;
 import com.zentaskapi.entity.taskmanagerapi.UserRole;
 import com.zentaskapi.exception.ResourceConflictException;
@@ -59,12 +59,13 @@ public class UserService {
     }
 
     @Transactional
-    public void deleteUser(UUID id, String currentUsername, boolean isAdmin) {
+    public String deleteUser(UUID id, String currentUsername, boolean isAdmin) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con ID: " + id));
 
         permissionService.verifyUserPermission(user, currentUsername, isAdmin);
         userRepository.delete(user);
+        return "Usuario eliminado exitosamente";
     }
 
     private void validateUniqueUsernameAndEmail(String username, String email) {

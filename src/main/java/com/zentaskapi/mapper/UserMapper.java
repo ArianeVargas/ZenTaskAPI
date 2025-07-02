@@ -1,9 +1,9 @@
 package com.zentaskapi.mapper;
 
 import com.zentaskapi.auth.dto.RegisterRequest;
-import com.zentaskapi.dto.CreateUserRequest;
-import com.zentaskapi.dto.UpdateUserRequest;
-import com.zentaskapi.dto.UserResponse;
+import com.zentaskapi.dto.user.CreateUserRequest;
+import com.zentaskapi.dto.user.UpdateUserRequest;
+import com.zentaskapi.dto.user.UserResponse;
 import com.zentaskapi.entity.User;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;

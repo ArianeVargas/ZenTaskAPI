@@ -1,8 +1,8 @@
 package com.zentaskapi.controller;
 
-import com.zentaskapi.dto.CreateUserRequest;
-import com.zentaskapi.dto.UpdateUserRequest;
-import com.zentaskapi.dto.UserResponse;
+import com.zentaskapi.dto.user.CreateUserRequest;
+import com.zentaskapi.dto.user.UpdateUserRequest;
+import com.zentaskapi.dto.user.UserResponse;
 import com.zentaskapi.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -47,9 +47,9 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable UUID id) {
-        userService.deleteUser(id, getCurrentUsername(), isCurrentUserAdmin());
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<String> deleteUser(@PathVariable UUID id) {
+        String successMessage = userService.deleteUser(id, getCurrentUsername(), isCurrentUserAdmin());
+        return new ResponseEntity<>(successMessage, HttpStatus.OK);
     }
 
     private String getCurrentUsername() {

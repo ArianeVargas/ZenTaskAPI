@@ -37,59 +37,71 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-                .csrf(AbstractHttpConfigurer::disable)
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .exceptionHandling(exception -> exception
-                        .accessDeniedHandler(accessDeniedHandler())
-                        .authenticationEntryPoint(authenticationEntryPoint())
-                )
-                .authorizeHttpRequests(auth -> auth
+            .csrf(AbstractHttpConfigurer::disable)
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .exceptionHandling(exception -> exception
+                .accessDeniedHandler(accessDeniedHandler())
+                .authenticationEntryPoint(authenticationEntryPoint())
+            )
+            .authorizeHttpRequests(auth -> auth
 
-                        // 🌐 Rutas públicas
-                        .requestMatchers("/", "/ZenTaskAPI/").permitAll()
-                        .requestMatchers("/api/auth/**").permitAll()
+                // 🌐 Rutas públicas
+                .requestMatchers("/", "/ZenTaskAPI/").permitAll()
+                .requestMatchers("/api/auth/**").permitAll()
 
-                        // 👤 Usuarios
-                        .requestMatchers(HttpMethod.GET, "/api/users").hasRole("ADMIN") // Listar todos
-                        .requestMatchers(HttpMethod.GET, "/api/users/{id}").authenticated() // ADMIN, MANAGER, o el mismo
-                        .requestMatchers(HttpMethod.POST, "/api/users").hasRole("ADMIN") // Crear
-                        .requestMatchers(HttpMethod.PUT, "/api/users/{id}").authenticated() // ADMIN o el mismo
-                        .requestMatchers(HttpMethod.PATCH, "/api/users/{id}").authenticated() // ADMIN o el mismo
-                        .requestMatchers(HttpMethod.DELETE, "/api/users/{id}").hasRole("ADMIN") // Eliminar
-                        .requestMatchers(HttpMethod.GET, "/api/users/*/time-entries").hasAnyRole("ADMIN", "MANAGER", "USER")
+                // 👤 Usuarios
+                .requestMatchers(HttpMethod.GET, "/api/users").hasRole("ADMIN") // Listar todos
+                .requestMatchers(HttpMethod.GET, "/api/users/{username}").authenticated() // ADMIN, MANAGER, o el mismo
+                .requestMatchers(HttpMethod.POST, "/api/users").hasRole("ADMIN") // Crear
+                .requestMatchers(HttpMethod.PUT, "/api/users/{id}").authenticated() // ADMIN o el mismo
+                .requestMatchers(HttpMethod.PATCH, "/api/users/{id}").authenticated() // ADMIN o el mismo
+                .requestMatchers(HttpMethod.DELETE, "/api/users/{id}").hasRole("ADMIN") // Eliminar
+                .requestMatchers(HttpMethod.GET, "/api/users/*/time-entries").hasAnyRole("ADMIN", "MANAGER", "USER")
 
-                        // ✅ Tareas
-                        .requestMatchers(HttpMethod.GET, "/api/tasks").hasAnyRole("ADMIN", "MANAGER", "USER")
-                        .requestMatchers(HttpMethod.GET, "/api/tasks/{id}").authenticated() // Participantes
-                        .requestMatchers(HttpMethod.POST, "/api/tasks").hasAnyRole("ADMIN", "MANAGER")
-                        .requestMatchers(HttpMethod.PUT, "/api/tasks/{id}").authenticated() // Asignado o MANAGER
-                        .requestMatchers(HttpMethod.PATCH, "/api/tasks/{id}/status").authenticated() // Asignado
-                        .requestMatchers(HttpMethod.PATCH, "/api/tasks/{id}/assign").hasRole("MANAGER")
-                        .requestMatchers(HttpMethod.DELETE, "/api/tasks/{id}").hasAnyRole("ADMIN", "MANAGER")
+                // ✅ Tareas
+                .requestMatchers(HttpMethod.GET, "/api/tasks").hasAnyRole("ADMIN", "MANAGER", "USER")
+                .requestMatchers(HttpMethod.GET, "/api/tasks/{id}").authenticated() // Participantes
+                .requestMatchers(HttpMethod.POST, "/api/tasks").hasAnyRole("ADMIN", "MANAGER")
+                .requestMatchers(HttpMethod.PUT, "/api/tasks/{id}").authenticated() // Asignado o MANAGER
+                .requestMatchers(HttpMethod.PATCH, "/api/tasks/{id}/status").authenticated() // Asignado
+                .requestMatchers(HttpMethod.PATCH, "/api/tasks/{id}/assign").hasRole("MANAGER")
+                .requestMatchers(HttpMethod.DELETE, "/api/tasks/{id}").hasAnyRole("ADMIN", "MANAGER")
 
-                        // ⏱️ Registros de tiempo
-                        .requestMatchers(HttpMethod.POST, "/api/tasks/{id}/time-entries").authenticated() // Asignado
-                        .requestMatchers(HttpMethod.GET, "/api/users/{id}/time-entries").authenticated() // Admin, self, Manager
+                // 📁 Proyectos
+                .requestMatchers(HttpMethod.GET, "/api/projects").authenticated() // Todos los usuarios pueden ver proyectos
+                .requestMatchers(HttpMethod.GET, "/api/projects/{id}").authenticated()
+                .requestMatchers(HttpMethod.POST, "/api/projects").hasAnyRole("ADMIN", "MANAGER") // Crear proyectos
+                .requestMatchers(HttpMethod.PUT, "/api/projects/{id}").hasAnyRole("ADMIN", "MANAGER") // Editar proyecto
+                .requestMatchers(HttpMethod.PATCH, "/api/projects/{id}").hasAnyRole("ADMIN", "MANAGER")
+                .requestMatchers(HttpMethod.DELETE, "/api/projects/{id}").hasRole("ADMIN") // Solo ADMIN elimina
 
-                        // 💬 Comentarios
-                        .requestMatchers(HttpMethod.POST, "/api/tasks/{id}/comments").authenticated()
-                        .requestMatchers(HttpMethod.GET, "/api/tasks/{id}/comments").authenticated()
+                // 📋 Miembros de proyecto
+                .requestMatchers(HttpMethod.POST, "/api/projects/{id}/members").hasAnyRole("ADMIN", "MANAGER")
+                .requestMatchers(HttpMethod.GET, "/api/projects/{id}/members").authenticated()
 
-                        // 🏷️ Tags
-                        .requestMatchers(HttpMethod.POST, "/api/tags").hasAnyRole("ADMIN", "MANAGER")
-                        .requestMatchers(HttpMethod.GET, "/api/tags").authenticated()
-                        .requestMatchers(HttpMethod.POST, "/api/tasks/{id}/tags").hasRole("MANAGER")
+                // ⏱️ Registros de tiempo
+                .requestMatchers(HttpMethod.POST, "/api/tasks/{id}/time-entries").authenticated() // Asignado
+                .requestMatchers(HttpMethod.GET, "/api/users/{id}/time-entries").authenticated() // Admin, self, Manager
 
-                        // 📎 Archivos adjuntos
-                        .requestMatchers(HttpMethod.POST, "/api/tasks/{id}/attachments").authenticated()
-                        .requestMatchers(HttpMethod.GET, "/api/tasks/{id}/attachments").authenticated()
+                // 💬 Comentarios
+                .requestMatchers(HttpMethod.POST, "/api/tasks/{id}/comments").authenticated()
+                .requestMatchers(HttpMethod.GET, "/api/tasks/{id}/comments").authenticated()
 
-                        // Todo lo demás requiere autenticación
-                        .anyRequest().authenticated()
-                )
-                .userDetailsService(userDetailsService)
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
-                .build();
+                // 🏷️ Tags
+                .requestMatchers(HttpMethod.POST, "/api/tags").hasAnyRole("ADMIN", "MANAGER")
+                .requestMatchers(HttpMethod.GET, "/api/tags").authenticated()
+                .requestMatchers(HttpMethod.POST, "/api/tasks/{id}/tags").hasRole("MANAGER")
+
+                // 📎 Archivos adjuntos
+                .requestMatchers(HttpMethod.POST, "/api/tasks/{id}/attachments").authenticated()
+                .requestMatchers(HttpMethod.GET, "/api/tasks/{id}/attachments").authenticated()
+
+                // Todo lo demás requiere autenticación
+                .anyRequest().authenticated()
+            )
+            .userDetailsService(userDetailsService)
+            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+            .build();
     }
 
     @Bean
